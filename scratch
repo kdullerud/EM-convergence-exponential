@@ -1,0 +1,84 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+import math
+
+def expect_lamb(x,lamb,a):
+    return x*(1 + a*np.exp((1-a)*lamb*x))**(-1)
+
+# conditional probability of z for additive case:
+def pz_add(x,lamb,a):
+    return ( 1 + (1 + (a/lamb) ) * np.exp(-a*x) )**(-1)
+
+# # for lambda_2 = a * lambda
+# expect = {}
+# fig, ax = plt.subplots(nrows=len(lamb), sharex=True)
+# for i in range(len(lamb)):
+#     l = lamb[i]
+#     x = draw_sample(1/l, a, n)
+#     new_vals = [ ( (a + 1) / (2*l) - (a-1)*(1/n) * (np.sum(expect_lamb(x,i,a))) )**(-1) for i in lamb_t]
+#     expect[f'Lambda_{l}'] = new_vals
+#     ax[i].plot(lamb_t,new_vals)
+#     ax[i].set_title(f'Lambda={l}')
+    
+# plt.show()
+
+# for lambda_2 = a + lambda
+# prob = {}
+# fig, ax = plt.subplots(nrows=len(lamb), sharex=True)
+# for i in range(len(lamb)):
+#     l = lamb[i]
+#     x = draw_sample_add(1/l, a, n)
+#     new_vals = [ (1/n) * (np.sum(pz_add(x,i,a)))  for i in lamb_t]
+#     prob[f'Lambda_{l}'] = new_vals
+#     ax[i].plot(lamb_t,new_vals)
+#     ax[i].set_title(f'Lambda={l}')
+
+# plt.show()
+
+# unbalanced
+# index=0
+# pi = 0.3
+# for i in beta:
+#     for j in a:
+#         for k in n:
+#             for N in range(runs):
+#                 np.random.seed(100+N)
+#                 x = draw_sample(i, j, k, pi)
+#                 #init = (1 + 1/a) / (2*np.mean(x)) + np.random.normal(0.1,0.1)
+#                 init = 1/np.random.random()
+#                 em_est, iters,iterates = em_unbalanced(x,j,pi,init,eps)
+#                 for iter in range(iters):
+#                     error = abs(iterates[iter]-i)
+#                     new_row = [i,j,k,em_est,iter,error]
+#                     em_df.loc[index] = new_row
+#                     index+=1
+
+
+# em_df['final_error'] = abs(em_df['beta']-em_df['em_est'])
+# em_df = em_df.groupby(['beta', 'a', 'n','iter']).mean().reset_index()
+# df_plot3 = em_df[(em_df['a'] == 2) | (em_df['a'] == 8)]
+# sns.set_theme(font='Arial')
+
+# # plot 1
+# ax = sns.lineplot(data=df_plot3, x='iter',y='error',hue=df_plot3[['a', 'beta']].apply(tuple, axis=1), 
+#              marker='o', errorbar=None)
+# plt.legend(loc=(0.95, 0.5), title = ('(α,β)'))
+# ax.set_yscale("log")
+# ax.set_xlabel('Iteration #')
+# ax.set_ylabel('Abs. Error')
+# plt.title('Statistical Error vs. Iteration, Unbalanced')
+# plt.show()
+
+
+## sanity check
+# lamb = 1
+# a = 5
+# n = 1000
+# eps = 1e-3
+# x = draw_sample(1/lamb, a, n)
+# init = 1/np.random.random()
+# my_em = em_closed(x, a, init, eps)[0]
+# em_steps = em_classic(x, a, init, eps)
+# print(my_em, em_steps)
