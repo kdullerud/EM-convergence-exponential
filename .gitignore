@@ -1,7 +1,5 @@
-<<<<<<< HEAD
 scratch 
 *venv/
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -220,4 +218,3 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
->>>>>>> 6bf25ee3c51a082639eb32fa0683f9eb5ae553ee
