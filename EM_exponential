@@ -61,10 +61,12 @@ def em_classic(x,a,init,eps):
         beta_t = new
     return beta_t
 
+# function to derive error bound found in Corollary 5
 def bound(row, delta=0.05,eps=0.01):
     value = (row['beta'] ) * (math.sqrt(math.log(2/delta)/row['n']) + math.log(2/delta)/row['n']) + eps
     return value
 
+# run simulations and return dataframe containing simulations information
 def run_sims(beta, a, n, eps, runs, it, sample):
     em_df = pd.DataFrame(columns=['beta', 'a','n','em_est','iter','error', 'ratio'])
     index=0
@@ -96,7 +98,7 @@ def run_plot_1(em_df, N, alpha):
 
     ax = sns.lineplot(data=df_plot1, x='iter',y='error',hue=df_plot1[['a', 'beta']].apply(tuple, axis=1), 
              marker='o', errorbar=None)
-    plt.legend(loc=(0.95, 0.5), title = ('(α,β)'))
+    plt.legend(loc=(0.85, 0.75), title = ('(α,β)'))
     ax.set_yscale("log")
     ax.set_xlabel('Iteration #')
     ax.set_ylabel('Abs. Error')
@@ -134,5 +136,5 @@ sample = 10
 
 em_df = run_sims(beta, a, n, eps, runs, it, sample)
 
-run_plot_1(em_df, N = n[1], alpha=a[0])
+run_plot_1(em_df, N = n[1], alpha=a[1])
 run_plot_2(em_df)
