@@ -63,22 +63,25 @@ def run_plot_unbalanced(em_df):
     plt.legend(loc=(0.85, 0.7), title = ('(α,β)'))
     ax.set_yscale("log")
     ax.set_xscale("log")
-    ax.set_xticks(em_df['n'].unique().tolist(), labels=em_df['n'].unique().tolist())
+    # ax.set_xticks(em_df['n'].unique().tolist(), labels=em_df['n'].unique().tolist())
     ax.set_ylabel('Abs. Error')
     
-    plt.title('Final Estimate Error vs. Sample Size')
+    #plt.title('Final Estimate Error vs. Sample Size')
     plt.show()
 
 
 # simulations
 beta = [0.5,5]
 a = [2,4]
-n = [1000, 10000, 50000]
+n = [100, 1000, 10000]
 eps=1e-2
 runs = 50
 it = 32
 ratio = 0.7
 sample = 10
 
+# run unbalanced simulations
 em_df_unbalanced = run_sims_unbalanced(beta, a, n, eps, runs, it, ratio, sample)
+
+# figure 5
 run_plot_unbalanced(em_df_unbalanced)

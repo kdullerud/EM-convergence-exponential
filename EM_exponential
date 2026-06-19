@@ -91,18 +91,16 @@ def run_sims(beta, a, n, eps, runs, it, sample):
 
 
 def run_plot_1(em_df, N, alpha):
-    df_plot1 = em_df[(em_df['n']== N ) & (em_df['a']== alpha )]
     fig, ax = plt.subplots()
     sns.set_theme(font='Arial')
     sns.set_style("white")
-
-    ax = sns.lineplot(data=df_plot1, x='iter',y='error',hue=df_plot1[['a', 'beta']].apply(tuple, axis=1), 
-             marker='o', errorbar=None)
-    plt.legend(loc=(0.85, 0.75), title = ('(α,β)'))
+    df_plot = em_df[(em_df['n']== N ) & (em_df['a']== alpha )]
+    ax = sns.lineplot(data=df_plot, x='iter',y='error',hue=df_plot[['a', 'beta']].apply(tuple, axis=1), 
+            marker='o', errorbar=None)
     ax.set_yscale("log")
     ax.set_xlabel('Iteration #')
     ax.set_ylabel('Abs. Error')
-    plt.title('Statistical Error vs. Iteration')
+    plt.legend(loc=(0.85, 0.75), title = ('(α,β)'))
     plt.show()
 
 def run_plot_2(em_df):
@@ -119,22 +117,25 @@ def run_plot_2(em_df):
     plt.legend(loc=(0.85, 0.7), title = ('(α,β)'))
     ax.set_yscale("log")
     ax.set_xscale("log")
-    ax.set_xticks(em_df['n'].unique().tolist(), labels=em_df['n'].unique().tolist())
+    # ax.set_xticks(em_df['n'].unique().tolist(), labels=em_df['n'].astype(int).unique().tolist())
     ax.set_ylabel('Abs. Error')
-    plt.title('Final Estimate Error vs. Sample Size')
     plt.show()
 
 
 # simulations
 beta = [0.5,5]
 a = [2,4]
-n = [1000, 10000, 50000]
+n = [100, 1000, 10000]
 eps=1e-2
 runs = 50
-it = 32
+it = 11
 sample = 10
 
 em_df = run_sims(beta, a, n, eps, runs, it, sample)
 
-run_plot_1(em_df, N = n[1], alpha=a[1])
+# figure 4
+run_plot_1(em_df, N = n[2], alpha=a[0])
+run_plot_1(em_df, N = n[2], alpha=a[1])
+
+# figure 3
 run_plot_2(em_df)
