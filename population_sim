@@ -33,8 +33,18 @@ def plot_sep(a, beta, x1, x2) :
     plt.suptitle(f'Exponential Mixture for α = {a}')
     plt.show()
 
-def plot_alpha():
-    pass
+def plot_alpha(a,b,x):
+    fig, ax = plt.subplots()
+    y_b = np.exp(-x / b) / b
+    y_a = a * np.exp(- a * x / b) / b
+    x_pt = b * math.log(a) / (a-1)
+    y_pt = math.exp(- math.log(a) / (a-1)) / b
+    ax.plot(x,y_b)
+    ax.plot(x,y_a)
+    ax.set_title(f'α={j}')
+    ax.scatter(x_pt, y_pt, color = 'black', zorder=10)
+    ax.set_ylim(top=5, bottom=-0.5)
+    plt.show()
 
 
 n = 1000
@@ -42,29 +52,11 @@ k = 2.5
 a = k * 10
 beta = 2
 
+# figure 1
+x = np.arange(0.05, 5, 0.05)
+plot_alpha(a, beta, x)
+
+# figure 2
 x, x1, x2 = draw_sample(beta, a, n)
 plot_sep(a, beta, x1, x2)
-# x = np.arange(0,5,0.01)
-
-
-# fig, ax = plt.subplots(nrows=int(len(a)*len(beta) / 2), 
-#                        ncols = int(len(a)*len(beta) / 2), sharex=True)
-
-# index_1 = [0,0,1,1]
-# index_2 = [0,1,0,1]
-# for j in a:
-#     for b in beta:
-#         ind_1 = index_1[a.index(j)]
-#         ind_2 = index_2[a.index(j)]
-#         y_b = np.exp(-x / b) / b
-#         y_a = j * np.exp(- j * x / b) / b
-#         x_pt = b * math.log(j) / (j-1)
-#         y_pt = math.exp(- math.log(j) / (j-1)) / b
-#         ax[ind_1, ind_2].plot(x,y_b)
-#         ax[ind_1, ind_2].plot(x,y_a)
-#         ax[ind_1, ind_2].set_title(f'α={j}')
-#         ax[ind_1, ind_2].scatter(x_pt, y_pt, color = 'black', zorder=10)
-#         ax[ind_1, ind_2].set_ylim(top=5, bottom=-0.5)
-fig, ax = plt.subplots()
-
 
