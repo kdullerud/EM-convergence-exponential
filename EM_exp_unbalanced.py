@@ -13,6 +13,7 @@ def draw_sample(beta, a, n, pi):
     np.random.shuffle(x)
     return x
 
+#EM algorithm for unbalanced mixture of two components
 def em_unbalanced(x, a, pi, init, eps, its):
     diff = 100
     current = init
@@ -58,19 +59,19 @@ def run_plot_unbalanced(em_df):
     sns.set_style("white")
 
     fig, ax = plt.subplots()
-    sns.lineplot(data=df_plot2, x='n',y='final_error',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1), 
+    sns.lineplot(data=df_plot2, x='n',y='final_error',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1),
                 marker='o', errorbar=None, ax=ax)
     plt.legend(loc=(0.85, 0.7), title = ('(α,β)'))
     ax.set_yscale("log")
     ax.set_xscale("log")
     # ax.set_xticks(em_df['n'].unique().tolist(), labels=em_df['n'].unique().tolist())
     ax.set_ylabel('Abs. Error')
-    
+
     #plt.title('Final Estimate Error vs. Sample Size')
     plt.show()
 
 
-# simulations
+# simulation setup
 beta = [0.5,5]
 a = [2,4]
 n = [100, 1000, 10000]

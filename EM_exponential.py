@@ -15,7 +15,7 @@ def draw_sample(beta, a, n, pi):
     np.random.shuffle(x)
     return x
 
-# EM algorithm for exponential using found closed-form 
+# EM algorithm for exponential using found closed-form
 def em_closed(x, a, init, eps, its):
     diff = 100
     current = init
@@ -53,7 +53,7 @@ def e_step(beta, x, a,beta_t):
 def em_classic(x,a,init,eps):
     beta_t = init
     diff = 100
-    while diff > eps: 
+    while diff > eps:
         res_M = minimize(e_step, x0=beta_t, args=(x, a, beta_t),
                     method='Nelder-Mead', bounds=[(0.0001,500)])
         new = res_M.x[0]
@@ -95,7 +95,7 @@ def run_plot_1(em_df, N, alpha):
     sns.set_theme(font='Arial')
     sns.set_style("white")
     df_plot = em_df[(em_df['n']== N ) & (em_df['a']== alpha )]
-    ax = sns.lineplot(data=df_plot, x='iter',y='error',hue=df_plot[['a', 'beta']].apply(tuple, axis=1), 
+    ax = sns.lineplot(data=df_plot, x='iter',y='error',hue=df_plot[['a', 'beta']].apply(tuple, axis=1),
             marker='o', errorbar=None)
     ax.set_yscale("log")
     ax.set_xlabel('Iteration #')
@@ -110,9 +110,9 @@ def run_plot_2(em_df):
     sns.set_style("white")
 
     fig, ax = plt.subplots()
-    sns.lineplot(data=df_plot2, x='n',y='final_error',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1), 
+    sns.lineplot(data=df_plot2, x='n',y='final_error',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1),
                 marker='o', errorbar=None, ax=ax)
-    sns.lineplot(data=df_plot2, x='n',y='bound',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1), 
+    sns.lineplot(data=df_plot2, x='n',y='bound',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1),
                 linestyle='dotted', errorbar=None, ax=ax)
     plt.legend(loc=(0.85, 0.7), title = ('(α,β)'))
     ax.set_yscale("log")
@@ -122,7 +122,7 @@ def run_plot_2(em_df):
     plt.show()
 
 
-# simulations
+# simulation setup
 beta = [0.5,5]
 a = [2,4]
 n = [100, 1000, 10000]
