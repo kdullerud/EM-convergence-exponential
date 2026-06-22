@@ -4,6 +4,7 @@ import pandas as pd
 import seaborn as sns
 import math
 
+#Data generation from mixture of 2 exponentials (Eq 1)
 def draw_sample(beta, a, n):
     n_1 = np.sum(np.random.binomial(n,0.5))
     x_1 = np.random.exponential(beta,n_1)
@@ -12,14 +13,7 @@ def draw_sample(beta, a, n):
     np.random.shuffle(x)
     return x, x_1, x_2
 
-def draw_sample_add(beta, a, n):
-    n_1 = np.sum(np.random.binomial(n,0.5))
-    x_1 = np.random.exponential(beta,n_1)
-    x_2 = np.random.exponential(1/(1/beta + a), n-n_1)
-    x = np.concat((x_1,x_2))
-    np.random.shuffle(x)
-    return x
-
+# Scatter plot of data from mixture
 def plot_sep(a, beta, x1, x2) :
     fig, ax = plt.subplots()
     sns.set_theme()
@@ -33,6 +27,7 @@ def plot_sep(a, beta, x1, x2) :
     plt.suptitle(f'Exponential Mixture for α = {a}')
     plt.show()
 
+# Plot of densities for different alpha values
 def plot_alpha(a,b,x):
     fig, ax = plt.subplots()
     y_b = np.exp(-x / b) / b
@@ -47,16 +42,17 @@ def plot_alpha(a,b,x):
     plt.show()
 
 
+
+#Simulation parameters
 n = 1000
 k = 2.5
 a = k * 10
 beta = 2
 
-# figure 1
+# Figure 1
 x = np.arange(0.05, 5, 0.05)
 plot_alpha(a, beta, x)
 
-# figure 2
+# Figure 2
 x, x1, x2 = draw_sample(beta, a, n)
 plot_sep(a, beta, x1, x2)
-
