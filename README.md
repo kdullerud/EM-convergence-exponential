@@ -1,5 +1,5 @@
 # Replication (Chandak and Dullerud, 2026+)
-Replications files for simulations in Chandak and Dullerud (2026+).
+Replications files for simulations in Chandak and Dullerud (arXiv:2606.28053, 2026+).
 
 ## Overview
 * population_sim.py contains the functions for generating the plots in Section 3 (Figures 1 and 2).
