@@ -1,0 +1,140 @@
+import numpy as np
+from scipy.optimize import minimize
+import math
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+# function to draw exponential mixture, returns shuffled sample
+def draw_sample(beta, a, n, pi):
+    n_1 = np.sum(np.random.binomial(n,pi))
+    x_1 = np.random.exponential(beta,n_1)
+    x_2 = np.random.exponential(beta / a, n-n_1)
+    x = np.concat((x_1,x_2))
+    np.random.shuffle(x)
+    return x
+
+# function to derive error bound found in Corollary 5
+def bound(row, delta=0.05,eps=0.01):
+    value = (row['beta'] ) * (math.sqrt(math.log(2/delta)/row['n']) + math.log(2/delta)/row['n']) + eps
+    return value
+
+def run_plot_1(em_df, N, alpha):
+    fig, ax = plt.subplots()
+    sns.set_theme(font='Arial')
+    sns.set_style("white")
+    df_plot = em_df[(em_df['n']== N ) & (em_df['a']== alpha )]
+    ax = sns.lineplot(data=df_plot, x='iter',y='error',hue=df_plot[['a', 'beta']].apply(tuple, axis=1),
+            marker='o', errorbar=None)
+    ax.set_yscale("log")
+    ax.set_xlabel('Iteration #')
+    ax.set_ylabel('Abs. Error')
+    plt.legend(loc=(0.85, 0.75), title = ('(α,β)'))
+    plt.show()
+
+def run_plot_2(em_df):
+    df_plot2 = em_df
+    df_plot2['bound'] = df_plot2.apply(bound, axis=1)
+    sns.set_theme(font='Arial')
+    sns.set_style("white")
+
+    fig, ax = plt.subplots()
+    sns.lineplot(data=df_plot2, x='n',y='final_error',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1),
+                marker='o', errorbar=None, ax=ax)
+    sns.lineplot(data=df_plot2, x='n',y='bound',hue=df_plot2[['a', 'beta']].apply(tuple, axis=1),
+                linestyle='dotted', errorbar=None, ax=ax)
+    plt.legend(loc=(0.85, 0.7), title = ('(α,β)'))
+    ax.set_yscale("log")
+    ax.set_xscale("log")
+    # ax.set_xticks(em_df['n'].unique().tolist(), labels=em_df['n'].astype(int).unique().tolist())
+    ax.set_ylabel('Abs. Error')
+    plt.show()
+
+# runs EM algorithm for unknown pi
+def em_closed_unknown(x, a, init1, init2, eps, its):
+    diff = 100
+    current = [init1,init2]
+    n = len(x)
+    j=0
+    iterates = []
+    for k in range(its):
+        sum_beta = 0
+        sum_pi = 0
+        T = np.zeros(shape=n)
+        for i in range(n):
+            T[i] = ( current[1] * math.exp(-x[i]/current[0]) ) / (current[1] * math.exp(-x[i]/current[0]) + (1-current[1]) * a * math.exp(-a*x[i]/current[0]) )
+            sum_pi += T[i]
+            sum_beta += a * x[i] - x[i] * (a-1) * T[i]
+        pi = (1/n)* sum_pi
+        beta = (1/n)* sum_beta
+        # diff = [abs(new-current)]
+        current = [beta, pi]
+        iterates.append(current[0])
+    j = its
+    return current,j,iterates
+
+# runs simulations for unknown pi
+def run_sims_unknown(beta, a, pi, n, eps, runs, it, sample):
+    em_df = pd.DataFrame(columns=['beta', 'pi', 'a','n','em_est_beta','em_est_pi','iter','error','final_error_beta', 'final_error_pi'])
+    index=0
+    for i in beta:
+        for j in a:
+            for k in n:
+                for N in range(runs):
+                    np.random.seed(100+N)
+                    x = draw_sample(i, j, k, pi)
+                    # init = (1 + 1/a) / (2*np.mean(x)) + np.random.normal(0.1,0.1)
+                    init1 = np.random.uniform(0,sample)
+                    init2 = np.random.uniform(0,1)
+                    em_est, iters,iterates = em_closed_unknown(x,j,init1,init2,eps, it)
+                    f_error_b = abs(i-em_est[0])
+                    f_error_p = abs(pi-em_est[1])
+                    for iter in range(iters):
+                        error = abs(iterates[iter]-i)
+                        new_row = [i,pi,j,k,em_est[0],em_est[1],iter+1,error, f_error_b, f_error_p]
+                        em_df.loc[index] = new_row
+                        index+=1
+    em_df['final_error_beta'] = abs(em_df['beta']-em_df['em_est_beta'])
+    em_df['final_error_pi'] = abs(em_df['pi']-em_df['em_est_pi'])
+    em_df = em_df.groupby(['beta','pi', 'a', 'n','iter']).mean().reset_index()
+    return em_df
+
+# runs simulations for noisy alpha
+def run_sims_noise(beta, a, n, eps, runs, it, sample):
+    em_df = pd.DataFrame(columns=['beta', 'a','n','em_est','iter','error', 'ratio'])
+    index=0
+    for i in beta:
+        for j in a:
+            for k in n:
+                for N in range(runs):
+                    r = j / i
+                    np.random.seed(100+N)
+                    x = draw_sample(i, j, k, 0.5)
+                    # init = (1 + 1/a) / (2*np.mean(x)) + np.random.normal(0.1,0.1)
+                    init = np.random.uniform(0,sample)
+                    # SNR = 4
+                    noise = np.random.normal(0,0.25 * j)
+                    # add noise here to alpha estimate passed to EM algorithm
+                    em_est, iters,iterates = em_closed(x,j + noise,init,eps, it)
+                    for iter in range(iters):
+                        error = abs(iterates[iter]-i)
+                        new_row = [i,j,k,em_est,iter+1,error, r]
+                        em_df.loc[index] = new_row
+                        index+=1
+    em_df['final_error'] = abs(em_df['beta']-em_df['em_est'])
+    em_df = em_df.groupby(['beta', 'a', 'n','iter']).mean().reset_index()
+    return em_df
+
+# simulation setup
+beta = [0.5, 5]
+a = [2,4]
+#pi = 0.45
+n = [100, 1000]
+eps=1e-2
+runs = 50
+it = 30
+sample = 10
+
+em_df = run_sims_noise(beta, a, n, eps, runs, it, sample)
+run_plot_2(em_df)
